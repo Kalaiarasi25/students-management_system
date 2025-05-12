@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Resource Management</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="images/logo.jpg" alt="SRM Logo" class="logo">
+            <h1>Welcome to Student Resource Management</h1>
+        </header>
+        
+        <div class="login-section">
+            <button onclick="showLogin('admin')">Admin Login</button>
+            <button onclick="showLogin('student')">Student Login</button>
+        </div>
+        
+        <div id="login-form" class="hidden">
+            <h2 id="login-title">Login</h2>
+            <form action="login.php" method="post">
+                <input type="hidden" id="user-type" name="user_type">
+                <input type="email" name="email" placeholder="Enter Email" required>
+                <input type="password" name="password" placeholder="Enter Password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+        
+        <div class="background-image"></div>
+    </div>
+</body>
+</html>

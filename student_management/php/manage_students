@@ -1,0 +1,94 @@
+<?php
+session_start();
+if (!isset($_SESSION['admin'])) {
+    header("Location: ../index.html");
+    exit();
+}
+include 'db_connect.php';
+
+// Add Student
+if (isset($_POST['add_student'])) {
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $department_id = $_POST['department_id'];
+    $attendance = $_POST['attendance'];
+    $marks = $_POST['marks'];
+    
+    $stmt = $conn->prepare("INSERT INTO students (name, email, password, department_id, attendance_percentage, marks) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssidi", $name, $email, $password, $department_id, $attendance, $marks);
+    $stmt->execute();
+    header("Location: manage_students.php");
+}
+
+// Delete Student
+if (isset($_GET['delete'])) {
+    $id = $_GET['delete'];
+    $stmt = $conn->prepare("DELETE FROM students WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    header("Location: manage_students.php");
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>Manage Students</h1>
+            <a href="admin_dashboard.php" class="back-btn">Back</a>
+        </header>
+        
+        <form method="POST" action="">
+            <input type="text" name="name" placeholder="Student Name" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <select name="department_id" required>
+                <option value="">Select Department</option>
+                <?php
+                $result = $conn->query("SELECT * FROM departments");
+                while ($row = $result->fetch_assoc()): ?>
+                    <option value="<?= $row['id'] ?>"><?= $row['name'] ?></option>
+                <?php endwhile; ?>
+            </select>
+            <input type="number" name="attendance" placeholder="Attendance (%)" required>
+            <input type="number" name="marks" placeholder="Marks" required>
+            <button type="submit" name="add_student">Add Student</button>
+        </form>
+        
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Attendance</th>
+                <th>Marks</th>
+                <th>Action</th>
+            </tr>
+            <?php
+            $result = $conn->query("SELECT students.id, students.name, students.email, departments.name AS department, students.attendance_percentage, students.marks FROM students JOIN departments ON students.department_id = departments.id");
+            while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $row['id'] ?></td>
+                    <td><?= $row['name'] ?></td>
+                    <td><?= $row['email'] ?></td>
+                    <td><?= $row['department'] ?></td>
+                    <td><?= $row['attendance_percentage'] ?>%</td>
+                    <td><?= $row['marks'] ?></td>
+                    <td>
+                        <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+        </table>
+    </div>
+</body>
+</html>
